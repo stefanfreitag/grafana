@@ -3,11 +3,20 @@
 # Recipe: grafana
 #
 
-# Create prometheus user
+# Create grafana user
 user node['grafana']['user'] do
   system true
   shell '/bin/false'
   home node['grafana']['dir']
+end
+
+[node['grafana']['log_dir']].each do |dir|
+  directory dir do
+    owner node['grafana']['user']
+    group node['grafana']['group']
+    mode '0755'
+    action :create
+  end
 end
 
 # Download grafana to local directory
@@ -26,16 +35,26 @@ execute 'Extract grafana' do
 end
 
 execute 'Change ownership' do
-  command "chown -R #{node['grafana']['user']}:#{node['grafana']['group']} /opt/grafana-5.2.2"
+  command "chown -R #{node['grafana']['user']}:#{node['grafana']['group']} /opt/grafana-#{node['grafana']['version']}"
   cwd '/tmp'
 end
 
 link '/opt/grafana' do
   owner node['grafana']['user']
   group node['grafana']['group']
-  to '/opt/grafana-5.2.2'
+  to "/opt/grafana-#{node['grafana']['version']}"
   link_type :symbolic
 end
+
+
+template ::File.join(node['grafana']['conf_dir'], 'grafana.ini') do
+  source 'grafana.ini.erb'
+  variables ini: node['grafana']['ini']
+  group node['grafana']['group']
+  mode '0644'
+  sensitive true
+end
+
 
 template '/etc/init.d/grafana' do
   source 'grafana.erb'
