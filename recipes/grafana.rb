@@ -31,6 +31,7 @@ end
 # Extract grafana to directory
 execute 'Extract grafana' do
   command "tar xzvf #{node['grafana']['local']} -C /opt"
+  not_if { ::File.exist?("/opt/grafana-#{node['grafana']['version']}")}
 end
 
 file node['grafana']['local'] do
@@ -68,4 +69,21 @@ end
 service 'grafana' do
   supports status: true, restart: true, reload: true
   action %i[enable start]
+end
+
+grafana_organization 'Default organization' do
+  organization(
+    name: 'Default organization'
+  )
+  action :update
+end
+
+grafana_user 'demo' do
+  user(
+    name: 'Demo User',
+    email: 'demouser@example.com',
+    password: 'demouser',
+    isAdmin: false
+  )
+  action :create
 end
