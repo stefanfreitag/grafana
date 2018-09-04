@@ -31,12 +31,14 @@ end
 # Extract grafana to directory
 execute 'Extract grafana' do
   command "tar xzvf #{node['grafana']['local']} -C /opt"
-  cwd '/tmp'
+end
+
+file node['grafana']['local'] do
+  action :delete
 end
 
 execute 'Change ownership' do
   command "chown -R #{node['grafana']['user']}:#{node['grafana']['group']} /opt/grafana-#{node['grafana']['version']}"
-  cwd '/tmp'
 end
 
 link '/opt/grafana' do

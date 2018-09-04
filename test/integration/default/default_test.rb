@@ -1,18 +1,43 @@
-# # encoding: utf-8
+# User and group settings
 
-# Inspec test for recipe grafana::default
-
-# The Inspec reference, with examples and extensive documentation, can be
-# found at http://inspec.io/docs/reference/resources/
-
-unless os.windows?
-  # This is an example test, replace with your own test.
-  describe user('root'), :skip do
-    it { should exist }
-  end
+describe user('grafana') do
+  it { should exist }
 end
 
-# This is an example test, replace it with your own test.
-describe port(80), :skip do
-  it { should_not be_listening }
+describe group('grafana') do
+  it { should exist }
+end
+
+# Ports
+describe port(22) do
+  it { should be_listening }
+end
+
+describe port(3000) do
+  it { should be_listening }
+end
+
+# Directories
+
+describe directory('/opt/grafana') do
+  its('link_path') { should eq '/opt/grafana-5.2.2' }
+  its('group') { should eq 'grafana' }
+  its('owner') { should eq 'grafana' }
+end
+
+describe directory('/var/log/grafana') do
+  its('group') { should eq 'grafana' }
+  its('owner') { should eq 'grafana' }
+end
+
+# Files
+
+describe file('/etc/init.d/grafana') do
+  it { should exist }
+end
+
+# Cleanup
+
+describe file('/tmp/grafana-5.2.2.linux-amd64.tar.gz') do
+  it { should_not exist }
 end

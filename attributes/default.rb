@@ -3,8 +3,10 @@
 # Attribute:: default
 #
 
+# Grafana version to install
 default['grafana']['version'] = '5.2.2'
 
+# Download URL for Grafana
 default['grafana']['url'] = "https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-#{node['grafana']['version']}.linux-amd64.tar.gz"
 
 # System user to use for grafana
